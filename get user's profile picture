@@ -1,0 +1,16 @@
+/*
+* function to get profile picture by user id    
+*/ 
+public function getUserProfilePicture($uid){
+  $user = \Drupal\user\Entity\User::load($uid); 
+   
+    if (!$user->user_picture->isEmpty()) {
+        $picture = file_create_url($user->user_picture->entity->getFileUri());      
+
+    }else{
+      $picture = '';    
+    }  
+ 
+   return $picture; 
+   
+}
