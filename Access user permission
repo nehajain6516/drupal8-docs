@@ -1,0 +1,38 @@
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Session\AccountInterface;
+
+class TestController extends ControllerBase {
+
+/*
+  * Access check for board / authorize - 
+  */
+  public function boardAccess(AccountInterface $account) {
+    $current_user = \Drupal::currentUser();
+    $user_roles = $current_user->getRoles();
+
+    if ($current_user->id() > 0) {
+
+      if (in_array('authenticated', $user_roles) && in_array('club_admin', $user_roles)) {
+        return AccessResult::allowed();
+      }
+      elseif (in_array('administrator', $user_roles)) {
+        return AccessResult::allowed();
+      }
+      elseif (in_array('authenticated', $user_roles) && in_array('board_member', $user_roles)) {
+        return AccessResult::allowed();
+      }
+      elseif (in_array('parent', $user_roles) && in_array('board_member', $user_roles)) {
+        return AccessResult::allowed();
+      }
+      else {
+        return AccessResult::forbidden();
+      }
+    }
+    else {
+      return AccessResult::forbidden();
+    }
+
+
+  } // ends
+
+}
