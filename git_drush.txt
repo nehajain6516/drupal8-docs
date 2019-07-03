@@ -1,0 +1,39 @@
+drush export configuration and commit to child branch "player-profile-demo"
+
+drush cex
+
+git status
+
+git add web/modules/custom/player/
+
+git commit -m "profile update"
+
+git push origin player-profile-demo
+
+=========================================================================
+
+Database import in xampp
+
+D:\Xampp\mysql\bin>mysql -u root -p my_db< C:\Users\demo\Downloads\demo.mysql
+
+=========================================================================
+
+Normal git commands
+
+git status - to see the status of files modified or untrace
+git add file1-path file2-path // to add file in repo
+git rm minimal.html 
+Master
+
+git clone "repo path"
+git pull origin master // to fetch data from master
+git chekout master  // to directly work with master
+git push origin master // push code at master branch directly
+
+With Branch
+git chekout dev  // to work with dev branch
+git pull origin dev // to fetch data from dev brach
+git push origin dev // push code at dev branch directly
+git pull origin master  //with child branch merge code with master (use !wq)
+
+
