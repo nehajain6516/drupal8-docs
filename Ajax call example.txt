@@ -1,0 +1,83 @@
+library 
+========================================== 
+product-page-styling:
+  js:
+    js/custom.js: {}
+    js/jquery-ui.min.js: {}
+    dependencies:
+    - core/jquery    
+
+==========================================
+define route in route.yml
+
+cross_ref.page:
+  path: 'cross_ref_list/{idproduct}'
+  defaults:     
+    _controller: '\Drupal\product_page\Controller\ProductPageController::ajaxCallbackCrossRefData'
+  requirements:
+    _access: 'TRUE'
+==========================================
+cal  Ajax 
+
+$output = '<div class="reference-table-sec"><div id="cross_ref_accordion">
+    <h2 id="request_data">CROSS R TAB <img src="'.$base_url.'/'.$module_path.'/images/arrow.png"></h2>
+     <div id="result"><ul>
+     <li>aaa</li>
+     <li>bbbb</li>
+     </ul></div>
+     
+     </div>
+     </div>
+      ';
+
+==========================================
+
+custom.js
+
+(function($){
+	$(document).ready(function(){
+
+	    $("#request_data").click(function(){
+	    var idproduct = 10;	
+        $.ajax({
+        url: Drupal.url('cross_ref/10'),
+        type:"POST",
+        data: {'idproduct': idproduct},
+        dataType:"html",
+        success: function(response) { 
+        $('#crs_data').html(response);
+       
+    }
+});
+
+
+	    });
+
+	  
+	    
+	});
+})(jQuery);
+
+==========================================
+
+Ajax callback result display
+
+/* Ajax callback */
+
+ public function ajaxCallbackCrossRefData($idproduct){
+  
+     
+      $out .= '<div id="result">this is test'.$idproduct ;
+      $out .= '</div><div id="xx"></div>';
+     
+     $output .=  '<ul>
+     <li>vvv</li>
+     <li>zzz</li>
+     </ul>';
+
+      echo $output;
+      exit;
+  
+  }
+==========================================
+
