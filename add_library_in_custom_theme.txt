@@ -1,0 +1,18 @@
+Add custom library  in currenct theme (/themes/custom_theme/custom_theme.libraries.yml)
+
+location - /themes/custom_theme/custom_theme.libraries.yml
+product-tmpl-styling:
+  css:
+    theme:
+      css/custom_product.css: {}
+  js:
+    js/custom.js: {}
+    js/jquery-ui.min.js: {}
+    dependencies:
+    - core/jquery
+    
+add files in folders...
+
+in twig file custom.twig
+To attach in template - write below code
+{{ attach_library('custom_theme/product-tmpl-styling') }}
