@@ -1,0 +1,9 @@
+Use below snippet to redirect user to certain url
+
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Drupal\Core\Url;
+
+$url = $base_url.'/goods_returns_requests/view/'.$request_id; // update view url
+    $response = new RedirectResponse($url);
+    $response->send();
+    return;
