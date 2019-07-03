@@ -1,0 +1,106 @@
+// drupal 8 pagination
+
+Route 
+============================================
+goods_returns.request_list:
+  path: '/goods_returns_requests/{status}'
+  defaults:
+    _controller: 'Drupal\goods_returns\Controller\GoodsReturnsFormPages::requestList'
+    _title: 'Request Status'
+    status: 'pending'
+  requirements:
+    _custom_access: '\Drupal\goods_returns\Controller\GoodsReturnsFormPages::requestListAccess'
+=====================================
+
+At Controller
+
+use Drupal\Core\Entity\Query;
+use Drupal\Core\Url;
+class GoodsReturnsFormPages extends ControllerBase {
+
+public function requestList($status="pending") {
+    
+$query = \Drupal::database()->select('md_returns_requests_items', 'rr');
+   $query->join('md_returns_requests','rri','rri.request_id=rr.request_id');
+   $query->fields('rr', ['request_id','date', 'customer']);
+   $query->fields('rri', ['uid','username','status']);
+   $pager = $query->extend('Drupal\Core\Database\Query\PagerSelectExtender')->limit(2);
+   $results = $pager->execute()->fetchAll();
+
+   // Initialize an empty array
+   $rows = array();
+   $header = ['Req#', 'Date', 'Customer','Status'];
+   foreach ($results as $result) {
+    if (isset($result->request_id)) {
+        $url = Url::fromUri('internal:/goods_returns_requests/edit/' . $result->request_id); 
+        $_link = \Drupal::l(t(''.$result->request_id), $url);
+      $rows[$result->request_id] = [         
+          $_link,
+          'date' => $result->date,
+          'customer' => $result->customer."(".$result->uid.")",
+          'status' => $result->status, 
+          
+      ];
+    }
+  }
+
+   $page = array
+    (
+      'page_header' => array
+      (
+        '#markup' => '',
+      ),
+      'data' => array
+      (
+        '#theme' => 'table',
+        '#header' => $header,
+        '#rows' => $rows,
+        '#empty' => t('No data found'),
+      ),
+      'pager' => array(
+        '#type' => 'pager'
+      )
+    ); 
+
+    return $page;
+    }
+}
+
+======================================================
+ 
+Array
+(
+    [0] => stdClass Object
+        (
+            [request_id] => 1
+            [date] => asdasd
+            [customer] => asdasd
+            [uid] => 2
+            [username] => oman
+            [status] => pending
+        )
+
+    [1] => stdClass Object
+        (
+            [request_id] => 2
+            [date] => zff
+            [customer] => dev
+            [uid] => 2
+            [username] => anydev
+            [status] => pending
+        )
+
+    [2] => stdClass Object
+        (
+            [request_id] => 4
+            [date] => dsad
+            [customer] => 
+            [uid] => 2
+            [username] => priya
+            [status] => pending
+        )
+
+)
+
+
+ 
