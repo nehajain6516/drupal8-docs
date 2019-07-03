@@ -1,0 +1,45 @@
+drush commands
+
+-----------------------------------------------------------
+create database  
+write databse name in setting.php
+create database - $ drush sql-create
+-----------------------------------------------------------
+Import database
+drush sql-cli < C:/wamp/www/git_repos/demo/database/backup.sql
+-----------------------------------------------------------
+drush 9 - reset password -
+drush upwd "admin" "123456"
+-----------------------------------------------------------
+drush 9 - create new user - 
+drush user:create adminuser --mail="demo@gmail.com" --password="letmein"
+-----------------------------------------------------------
+drush user:role:add "administrator" adminuser
+-----------------------------------------------------------
+
+Install /Uninstall module 
+
+drush en miniorange_saml
+drush pm-uninstall devel
+-----------------------------------------------------------
+Check Module List
+drush pm-list --type=Module --no-core   --status=enabled 
+------------------------------------------------------------
+
+drush install drupal module with composer
+$ git reset --hard HEAD
+$ git pull origin master
+$ drush sql-cli < D:/XAMPP7/htdocs/chnages.mysql
+$ composer update
+$ git checkout master
+$ git pull origin master
+$ git checkout -b single_signon
+$ drush cex  ****
+$ drush en miniorange_saml ****
+$ drush cex ****
+$ git status
+
+----------------------------------------------------------------
+$ drush cex  ****
+$ drush en miniorange_saml ****
+$ drush cex ****
