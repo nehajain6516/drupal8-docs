@@ -1,0 +1,33 @@
+// Render single form
+/**
+ * @file
+ * Contains \Drupal\order_file\Controller\OrderFormPages.
+ */
+
+namespace Drupal\order_file\Controller;
+
+use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Form\FormBase;
+use Drupal\Core\Form\FormStateInterface;
+  
+
+class OrderFormPages extends ControllerBase {
+
+  public function returnsForm1() {
+
+  	$form = \Drupal::formBuilder()->getForm('Drupal\order_file\Form\orderFileForm1');
+
+  	$output = render($form);
+  	return array(
+          '#title' => t("ORDER WITH FILE OR TABLE"),
+            '#type' => 'markup',
+            '#allowed_tags' => ['form','img','button','label','input','b','a','p','h1','h2','h3',
+            'table','tr','td','th','div'],
+            '#cache' => ['max-age' => 0],
+            '#markup' => $output,
+        );
+   
+  }
+
+}
