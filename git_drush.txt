@@ -36,4 +36,6 @@ git pull origin dev // to fetch data from dev brach
 git push origin dev // push code at dev branch directly
 git pull origin master  //with child branch merge code with master (use !wq)
 
-
+To reset code
+ git reset --hard HEAD
+ git reset
