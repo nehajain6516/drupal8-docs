@@ -1,0 +1,158 @@
+At routing.yml
+
+custom_work.fee_list:
+  path: '/class/{class_id}/list'
+  defaults:
+    _controller: '\Drupal\custom_work\Controller\FeeDetailController::fee_list'
+    _title: 'Fee Details'
+  requirements:
+    _custom_access: '\Drupal\custom_work\Controller\FeeDetailController::access'
+
+custom_work.fee_details:
+  path: '/class/{class_id}/{month}/{year}/details'
+  defaults:
+    _controller: '\Drupal\custom_work\Controller\FeeDetailController::fee_details'
+    _title: 'Fee Details'
+  requirements:
+    _custom_access: '\Drupal\custom_work\Controller\FeeDetailController::access'
+    
+    
+    
+At Controller Page  FeeDetailController.php
+<?php
+
+/**
+ * @file
+ * Contains \Drupal\custom_work\Controller\FeeDetailController.
+ */
+
+namespace Drupal\custom_work\Controller;
+
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Database\Database;
+use Drupal\Core\Url;
+Use Drupal\Core\Link; 
+
+ /**
+ * FeeDetailController.
+ */
+class FeeDetailController extends ControllerBase {
+
+  /**
+   * Checks access for this controller.
+   */
+  public function access() {
+    $current_user = \Drupal::currentUser();
+    $roles = $current_user->getRoles();     
+    $allowed_roles = ['administrator'];
+    
+    if(!empty(array_intersect($allowed_roles, $roles))) {
+      return AccessResult::allowed();
+
+    }
+
+    return AccessResult::forbidden();
+  }
+
+  /**
+   * Fee List page content.
+   */
+  public function content($class_id="null") {
+    global $base_url;
+    $build = [];
+
+    $build['title'] = [
+      '#markup' => "<h1>Pending Fees</h1>",
+    ];
+
+     
+    $filter_form = '<div class="payment_details"> 
+    <h2>'.$class_id.'</h2>
+    </div>';     
+
+    $build = array(
+    '#type' => 'inline_template',
+    '#template' => $filter_form,
+    );
+
+    $header = array(
+    array('data' => t('Ref ID'), 'field' => 'id','sort' => 'desc'),  
+    array('data' => t('Month'), 'field' => 'month','sort' => 'desc'),
+    array('data' => t('Year'), 'field' => 'year'),
+    array('data' => t('Payment Status'), 'field' => 'status'),
+    array('data' => t('Reason'), 'field' => 'reason'), 
+    array('data' => t('Operation'), 'field' => 'operation'),   
+    );
+
+    $rows = [];
+    $months = array (1=>'Jan',2=>'Feb',3=>'Mar',4=>'Apr',5=>'May',6=>'Jun',7=>'Jul',8=>'Aug',9=>'Sep',10=>'Oct',11=>'Nov',12=>'Dec');
+
+    $transactions = $this->get_payment_history_of_class($class_id); 
+
+    foreach ($transactions as $key => $value) {   
+      $m = $value->month;
+      $ref_id = $value->id ;
+      $month = $months[(int)$m];
+      $year = $value->year ;
+      if($value->payment_status == 1){
+        $status = "Paid";
+      }else{
+        $status = "Not Paid";
+      }
+       
+      $reason = $value->reason ;    
+       
+      $link = \Drupal\Core\Link::fromTextAndUrl('View Details',
+      \Drupal\Core\Url::fromRoute(
+        'custom_work.fee_details',
+        ['class_id' => $class_id] + [ 'month' => $m,'year' => $year],
+        ['absolute' => TRUE]
+      ))->toString();
+ 
+ 
+      $rows[] = [ $ref_id,
+      $month,
+      $year,
+      $status,
+      $reason,
+      $link,      
+      ];
+      }
+
+      $build['location_table'] = array(
+      '#theme' => 'table', '#header' => $header,'#rows' => $rows      
+      ); 
+     
+    return $build;
+
+  }
+
+  function get_payment_history_of_class($class_id) {
+
+    $select = db_select('class_payment', 'class_paym');
+    $select->fields('class_paym',array('id','month','year','payment_status','reason'));
+    $select->condition('class_paym.class_id', $class_id);  
+    $history = $select->execute()->fetchAll();        
+    return $history;
+  }
+
+
+
+function payment_details($class_id="null",$month="null",$year="null"){
+ $class_name = get_class_name($class_id);
+ 
+ $data = '<div class="payment_details"> 
+    <h2>'.$class_name.'</h2>
+    <h3>Transation For  '.$month.'-'.$year.'</h3>
+    </div>';     
+
+    $build = array(
+    '#type' => 'inline_template',
+    '#template' => $data,
+    );
+ return $build;
+
+}
+
+} // controller ends
