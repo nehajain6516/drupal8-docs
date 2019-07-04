@@ -1,5 +1,6 @@
 D:\XAMPP7\htdocs\project\web\modules\custom\my_module\cms_alter.views.inc
-
+below code will enable , in add field when we select category"global field " we get the option 
+PHP Field |Global 	| Enable to include and run PHP code in your modules as part of a view
 <?php
 
 /**
@@ -37,6 +38,71 @@ function cms_alter_views_data() {
 
   return $data;
 }
+===========================================================================
+D:\XAMPP7\htdocs\project\web\modules\custom\my_module\src\Plugin\views\area\PhpViewsHeader.php
+Below code to get function name and fetch values from that function and it will handle field value 
+
+<?php
+
+namespace Drupal\cms_alter\Plugin\views\area;
+
+use Drupal\calendar\CalendarHelper;
+use Drupal\Component\Utility\Xss;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\views\Plugin\views\area\TokenizeAreaPluginBase;
+use Drupal\views\Render\ViewsRenderPipelineMarkup;
+
+/**
+ * Views area Calendar Header area.
+ *
+ * @ingroup views_area_handlers
+ *
+ * @ViewsArea("phpviews_header")
+ */
+class PhpViewsHeader extends TokenizeAreaPluginBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function defineOptions() {
+    $options = parent::defineOptions();
+    // Provide our own defaults.
+    $options['php_function'] = ['default' => ''];
+
+    return $options;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+    parent::buildOptionsForm($form, $form_state);
+
+    $form['php_function'] = [
+      '#title' => $this->t('PHP Function Name'),
+      '#type' => 'textfield',
+      '#default_value' => $this->options['php_function'],
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function render($empty = FALSE) {
+
+    if (!$empty || !empty($this->options['php_function'])) {
+      $function = $this->options['php_function'];
+      return $this->$function();
+    }
+
+    return [];
+  }
+
+ 
+
+}
+
+
 
 
 ===========================================================================
