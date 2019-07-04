@@ -1,0 +1,219 @@
+D:\XAMPP7\htdocs\project\web\modules\custom\my_module\cms_alter.views.inc
+
+<?php
+
+/**
+ * @file
+ * Contains cms_alter\my_module.views.inc..
+ * Provide a custom views field data that isn't tied to any other module. */
+
+use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
+use Drupal\Core\Render\Markup;
+use Drupal\field\FieldConfigInterface;
+use Drupal\field\FieldStorageConfigInterface;
+use Drupal\system\ActionConfigEntityInterface;
+
+/**
+ * Implements hook_views_data().
+ */
+function cms_alter_views_data() {
+  $data['views']['phpviews_field'] = [
+    'title' => t('PHP Field'),
+    'help' => t('Enable to include and run PHP code in your modules as part of a view'),
+    'field' => [
+      'id' => 'phpviews_field',
+    ],
+  ];
+
+  $data['views']['phpviews_header'] = [
+    'title' => t('PHP Section'),
+    'help' => t('Enable to include and run PHP code in your modules as part of a view.'),
+    'area' => [
+      'id' => 'phpviews_header',
+    ],
+  ];
+
+  return $data;
+}
+
+
+===========================================================================
+Create a new field in view 
+Global: PHP Field (Pending Fees)
+in PHP Function Name - write your function name
+getClassTotalPendingAmount
+
+Define this function in below path
+D:\XAMPP7\htdocs\project\web\modules\custom\my_module\src\Plugin\views\field\PHPViewsField.php
+
+===========================================================================
+<?php
+
+namespace Drupal\cms_alter\Plugin\views\field;
+
+use DateTime;
+use Drupal\Component\Utility\Xss;
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\HtmlCommand;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
+use Drupal\user\Entity\Role;
+use Drupal\views\Plugin\views\field\FieldPluginBase;
+use Drupal\views\Render\ViewsRenderPipelineMarkup;
+use Drupal\views\ResultRow;
+
+/**
+ * A handler to provide a field that is completely custom by the administrator.
+ *
+ * @ingroup views_field_handlers
+ *
+ * @ViewsField("phpviews_field")
+ */
+class PHPViewsField extends FieldPluginBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function usesGroupBy() {
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function query() {
+    // Do nothing -- to override the parent query.
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function defineOptions() {
+    $options = parent::defineOptions();
+
+    $options['php_function'] = ['default' => ''];
+
+    $options['hide_alter_empty'] = ['default' => FALSE];
+    return $options;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+    parent::buildOptionsForm($form, $form_state);
+
+    $form['#attached']['library'][] = 'core/drupal.ajax';
+
+    $form['php_function'] = [
+      '#type' => 'textfield',
+      '#title' => 'PHP Function Name',
+      '#default_value' => $this->options['php_function'],
+      //      '#ajax' => [
+      //        'callback' => [get_class($this), 'submitAjaxForm'],
+      //        'event' => 'focusout',
+      //      ],
+      '#required' => TRUE,
+      //      '#prefix' => '<div id="'.$this->getWrapperId().'">',
+      //      '#suffix' => '</div>',
+    ];
+  }
+
+  /**
+   * Submit form #ajax callback.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   *   An Ajax response that display validation error messages or redirects
+   *   to a URL
+   */
+  public function submitAjaxForm(array &$form, FormStateInterface $form_state) {
+
+    $values = $form_state->getValues();
+    $function_name = $values['options']['php_function'];
+    if (!method_exists('PHPViewsField', $function_name)) {
+      $form_state->setErrorByName("php_function", t('PHP function not found'));
+    }
+
+    $response = new AjaxResponse();
+
+    if ($form_state->getErrors()) {
+      $form = [
+          'status_messages' => [
+            '#type' => 'status_messages',
+            '#weight' => -1000,
+          ],
+        ] + $form;
+
+      // Remove wrapper.
+      unset($form['#prefix'], $form['#suffix']);
+
+      $response->addCommand(new HtmlCommand('#' . $this->getWrapperId(), $form));
+    }
+    else {
+      $response = new AjaxResponse();
+      return $response;
+    }
+
+    return $response;
+  }
+
+  /**
+   * Get the form's Ajax wrapper id.
+   *
+   * @return string
+   *   The form's Ajax wrapper id.
+   */
+  protected function getWrapperId() {
+    return $this->getPluginId() . '-ajax';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function render(ResultRow $values) {
+    $function = $this->options['php_function'];
+    return $this->$function($values);
+  }
+
+  
+
+
+ public function getClubTotalPendingAmount(ResultRow $values) {
+  global $base_url;
+  $node = $values->_entity;
+  //    dpm($node);
+  $club_id = $node->id();
+  $season_id = $node->get('field_season')->getString();
+  $markup = $this->renderMarkup("<a href='$base_url/club/$club_id/payment_list'>$club_id</a>");
+  return $this->renderMarkup($markup);
+ }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+
