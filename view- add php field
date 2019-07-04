@@ -5,7 +5,7 @@ PHP Field |Global 	| Enable to include and run PHP code in your modules as part 
 
 /**
  * @file
- * Contains cms_alter\my_module.views.inc..
+ * Contains my_module\my_module.views.inc..
  * Provide a custom views field data that isn't tied to any other module. */
 
 use Drupal\Component\Utility\NestedArray;
@@ -44,7 +44,7 @@ Below code to get function name and fetch values from that function and it will 
 
 <?php
 
-namespace Drupal\cms_alter\Plugin\views\area;
+namespace Drupal\my_module\Plugin\views\area;
 
 use Drupal\calendar\CalendarHelper;
 use Drupal\Component\Utility\Xss;
